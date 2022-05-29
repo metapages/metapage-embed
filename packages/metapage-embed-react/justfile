@@ -138,6 +138,9 @@ _npm_build_internal:
 # bumps version, commits change, git tags
 _npm_version npmversionargs="patch":
     npm version {{npmversionargs}}
+    git add package.json package-lock.json ../../package-lock.json
+    git commit -m "bump version to $(cat package.json | jq -r '.version')"
+
 
 # If the npm version does not exist, publish the module
 _npm_publish: _require_NPM_TOKEN _npm_build
