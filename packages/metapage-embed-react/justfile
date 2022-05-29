@@ -19,7 +19,7 @@ export DOCKER_TAG                  := `if [ "${GITHUB_ACTIONS}" = "true" ]; then
 # The NPM_TOKEN is required for publishing to https://www.npmjs.com
 NPM_TOKEN                          := env_var_or_default("NPM_TOKEN", "")
 vite                               := "VITE_APP_FQDN=" + APP_FQDN + " VITE_APP_PORT=" + APP_PORT + " NODE_OPTIONS='--max_old_space_size=16384' ./node_modules/vite/bin/vite.js"
-tsc                                := "./node_modules/typescript/bin/tsc"
+tsc                                := "../../node_modules/typescript/bin/tsc"
 # minimal formatting, bold is very useful
 bold                               := '\033[1m'
 normal                             := '\033[0m'
@@ -70,9 +70,10 @@ build: (_tsc "--build") _browser_assets_build _npm_build
 # Test: currently bare minimum: only building. Need proper test harness.
 @test: _npm_build
 
+# _ensureGitPorcelain
 # _githubpages_publish
 # Publish to github pages.
-publish npmversionargs="patch": _ensureGitPorcelain test (_npm_version npmversionargs)
+publish npmversionargs="patch":    test (_npm_version npmversionargs)
     @# Push the tags up
     git push origin v$(cat package.json | jq -r '.version')
 
@@ -131,7 +132,8 @@ serve BUILD_SUB_DIR="": (_browser_assets_build BUILD_SUB_DIR)
 _npm_build_internal:
     mkdir -p dist
     rm -rf dist/*
-    {{tsc}} --noEmit false --project ./tsconfig.npm.json
+    npm run build
+    # {{tsc}} --noEmit false --project ./tsconfig.npm.json
     @echo "  ✅ npm build"
 
 # bumps version, commits change, git tags
