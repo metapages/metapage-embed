@@ -1,0 +1,7 @@
+{
+    "name": "@metapages/metapage-embed",
+    "private": true,
+    "workspaces": [
+      "./packages/*"
+    ]
+  }
