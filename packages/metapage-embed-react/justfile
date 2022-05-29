@@ -72,8 +72,8 @@ build: (_tsc "--build") _browser_assets_build _npm_build
 
 # _ensureGitPorcelain
 # _githubpages_publish
-# Publish to github pages.
-publish npmversionargs="patch":    test (_npm_version npmversionargs)
+# Publish to https://www.npmjs.com
+publish npmversionargs="patch": test (_npm_version npmversionargs) _npm_publish
     @# Push the tags up
     git push origin v$(cat package.json | jq -r '.version')
 
@@ -133,7 +133,6 @@ _npm_build_internal:
     mkdir -p dist
     rm -rf dist/*
     npm run build
-    # {{tsc}} --noEmit false --project ./tsconfig.npm.json
     @echo "  ✅ npm build"
 
 # bumps version, commits change, git tags
