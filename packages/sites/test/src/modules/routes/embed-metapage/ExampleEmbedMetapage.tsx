@@ -1,35 +1,71 @@
-import React from "react";
+import React, { useCallback, useState } from "react";
 import { MetapageGridLayout } from "@metapages/metapage-embed-react";
-import { MetapageDefinition, VersionsMetapage } from "@metapages/metapage";
-import { Box, propNames } from "@chakra-ui/react";
+import { MetapageDefinition, MetapageEventDefinition, VersionsMetapage } from "@metapages/metapage";
+import { Box, Tag, Alert, AlertIcon, AlertDescription } from "@chakra-ui/react";
 
-export const CustomBox: React.FC = (props:any) => {
-  return <Box key={props.key} borderWidth='1px' >{props.children}</Box>
-}
+const CustomGridItemComponentLabel = React.forwardRef((props: any, ref) => {
+  return (
+    <Box
+      style={{ overflow: "hidden", textAlign: "left", ...props.style }}
+      borderWidth="1px"
+      className={props.className}
+      ref={ref as any}
+    >
+      <Tag>{props.children[0].key}</Tag>
+      {props.children}
+    </Box>
+  );
+});
 
+const CustomGridItemComponent = React.forwardRef((props: any, ref) => {
+  return (
+    <Box
+      style={{ overflow: "hidden", ...props.style }}
+      borderWidth="1px"
+      className={props.className}
+      ref={ref as any}
+    >
+      {props.children}
+    </Box>
+  );
+});
 
-const CustomGridItemComponent = React.forwardRef((props:any, ref) => {
-
-
-    return <Box key={props.key} style={{ overflow:"hidden",...props.style}} borderWidth='1px' className={props.className} ref={ref as any} >{props.children}</Box>;
-
-
-  // <div style={{ /* styles */, ...style}} className={className} ref={ref}>
-  //     {/* Some other content */}
-  //   </div>
-})
-
+const CustomErrorDisplay: React.FC<{ error: any }> = ({ error }) => {
+  return (
+    <Alert status="error">
+      <AlertIcon />
+      <AlertDescription>{`${error}`}</AlertDescription>
+    </Alert>
+  );
+};
 
 export const ExampleEmbedMetapage: React.FC = () => {
+
+
+  const [definition, setDefinition] = useState<MetapageDefinition>(exampleDefinition);
   const onOutputs = (outputs: any) => {
     // console.log(`Got outputs!! outputs=${JSON.stringify(outputs)}`);
+    console.log(`Got outputs!! outputs=${outputs}`);
   };
+
+
+  const onDefinition = useCallback((def: MetapageDefinition) => {
+    console.log(`Got def=${Object.keys(def)}`);
+    console.log('exampleDefinition === def', exampleDefinition === def);
+    console.log(`Got def=${JSON.stringify(def)}`);
+    setDefinition(def);
+  }, [setDefinition]);
+
+  // console.log("about to stringify exampleDefinition")
+  // console.log('JSON.stringify(exampleDefinition)', JSON.stringify(exampleDefinition));
   return (
     <div>
       <MetapageGridLayout
-        definition={exampleDefinition}
+        definition={definition}
         onOutputs={onOutputs as any}
-        Wrapper={CustomGridItemComponent}
+        onDefinition={onDefinition}
+        Wrapper={CustomGridItemComponentLabel}
+        ErrorWrapper={CustomErrorDisplay}
       />
     </div>
   );
@@ -61,6 +97,20 @@ const exampleDefinition: MetapageDefinition = {
           ],
         ],
       },
+      "react-grid-layout": {
+        docs: "https://www.npmjs.com/package/react-grid-layout",
+        props: {
+          cols: 12,
+          margin: [10, 20],
+          rowHeight: 100,
+          containerPadding: [5, 5],
+        },
+        layout: [
+          { i: "random-data-generator", x: 0, y: 0, w: 6, h: 2 },
+          { i: "graph-dynamic", x: 6, y: 0, w: 6, h: 4 },
+          { i: "editor", x: 0, y: 1, w: 6, h: 2 },
+        ],
+      },
     },
   },
   metaframes: {
@@ -77,7 +127,7 @@ const exampleDefinition: MetapageDefinition = {
         },
       ],
     },
-    "editor": {
+    editor: {
       url: "https://metapages.github.io/metaframe-editor/",
       inputs: [
         {

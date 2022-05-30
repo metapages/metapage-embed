@@ -43,9 +43,9 @@ export const MetaframeIframe: React.FC<{
           ref.current.removeChild(child);
         }
         // https://stackoverflow.com/questions/18765762/how-to-make-width-and-height-of-iframe-same-as-its-parent-div
-        iframe.style.cssText =
-          `position:absolute;top:0px;width:100%;height:${height ? height : "100vh"};`;
-          // `position:absolute;top:0px;width:100%;height:100%;`;
+        iframe.style.cssText = `position:absolute;top:0px;width:100%;height:${
+          height ? height : "100vh"
+        };`;
         ref.current.appendChild(iframe);
       }
     })();
@@ -63,8 +63,12 @@ export const MetaframeIframe: React.FC<{
   }
 
   if (Wrapper) {
-    return <Wrapper ref={ref} key={metaframe.id} style={{ position: "relative" }} />;
+    return (
+      <Wrapper ref={ref} key={metaframe.id} style={{ position: "relative" }} />
+    );
   } else {
-    return <div ref={ref} key={metaframe.id} style={{ position: "relative" }}></div>;
+    return (
+      <div ref={ref} key={metaframe.id} style={{ position: "relative" }}></div>
+    );
   }
 };

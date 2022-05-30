@@ -2,13 +2,17 @@ import React, { ComponentType, useCallback, useEffect, useState } from "react";
 import {
   Metapage,
   MetapageDefinition,
+  MetapageEventDefinition,
   MetapageEvents,
   MetapageInstanceInputs,
 } from "@metapages/metapage";
-import GridLayout, { ItemCallback, Layout, WidthProvider } from "react-grid-layout";
+import GridLayout, {
+  Layout,
+  WidthProvider,
+} from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { MetaframeIframe } from './MetaframeIframe';
+import { MetaframeIframe } from "./MetaframeIframe";
 
 const ResizingGridLayout = WidthProvider(GridLayout);
 
@@ -16,13 +20,19 @@ export const MetapageGridLayout: React.FC<{
   definition: MetapageDefinition;
   inputs?: MetapageInstanceInputs;
   onOutputs?: (outputs: MetapageInstanceInputs) => void;
-  onDefinitionChange?: (definition: MetapageDefinition) => void;
-  styleProps?: React.CSSProperties;
-  stylePropsTitle?: React.CSSProperties;
-  showTitle?: boolean;
+  onDefinition?: (e: MetapageDefinition) => void;
   Wrapper: ComponentType<any>;
+  ErrorWrapper: ComponentType<any>;
   debug?: boolean;
-}> = ({ definition, inputs, onOutputs, onDefinitionChange, debug, styleProps = {width:"100%", height:"100%", overflowY: "scroll"}, stylePropsTitle, showTitle, Wrapper }) => {
+}> = ({
+  definition,
+  inputs,
+  onOutputs,
+  onDefinition,
+  debug,
+  Wrapper,
+  ErrorWrapper,
+}) => {
   const [metapage, setMetapage] = useState<Metapage | undefined>();
   const [error, setError] = useState<any | undefined>();
 
@@ -51,11 +61,11 @@ export const MetapageGridLayout: React.FC<{
         metapage.addListenerReturnDisposer(MetapageEvents.Outputs, onOutputs)
       );
     }
-    if (onDefinitionChange) {
+    if (onDefinition) {
       disposers.push(
         metapage.addListenerReturnDisposer(
           MetapageEvents.Definition,
-          onDefinitionChange
+          (e :MetapageEventDefinition) => onDefinition(e.definition)
         )
       );
     }
@@ -69,7 +79,7 @@ export const MetapageGridLayout: React.FC<{
       }
       metapage.dispose();
     };
-  }, [definition, setMetapage, onOutputs, debug]);
+  }, [definition, setMetapage, onOutputs, debug, onDefinition]);
 
   // listeners
   useEffect(() => {
@@ -78,41 +88,69 @@ export const MetapageGridLayout: React.FC<{
     }
   }, [metapage, inputs]);
 
+  const defaultLayout = !metapage
+    ? []
+    : Object.keys(metapage.getMetaframes()).map((metaframeId, i) => {
+        return {
+          i: metaframeId,
+          x: i % 2 === 0 ? 0 : 6,
+          y: Math.floor(i / 2),
+          w: 6,
+          h: 2,
+        };
+      });
+  const rowHeight =
+    (metapage &&
+      definition?.meta?.layouts?.["react-grid-layout"]?.props?.rowHeight) ||
+    100;
+  const containerPadding = (metapage &&
+    definition?.meta?.layouts?.["react-grid-layout"]?.props
+      ?.containerPadding) || [5, 5];
+  const cols =
+    (metapage &&
+      definition?.meta?.layouts?.["react-grid-layout"]?.props?.cols) ||
+    12;
+  const margin = (metapage &&
+    definition?.meta?.layouts?.["react-grid-layout"]?.props?.margin) || [
+    10, 20,
+  ];
+  let layout =
+    metapage && definition?.meta?.layouts?.["react-grid-layout"]?.layout
+      ? [...definition?.meta?.layouts?.["react-grid-layout"]?.layout]
+      : defaultLayout;
   const onLayoutChange = useCallback(
     (layout: Layout[]) => {
-      console.log('layout', layout);
+      if (!onDefinition) {
+        return;
+      }
+
+      const newDefinition = { ...definition };
+      newDefinition.meta = newDefinition.meta || {};
+      newDefinition.meta.layouts = newDefinition.meta.layouts || {};
+
+      const reactGridLayout = {
+        docs: "https://www.npmjs.com/package/react-grid-layout",
+        props: {
+          cols,
+          margin,
+          rowHeight,
+          containerPadding,
+        },
+        layout,
+      };
+      newDefinition.meta.layouts["react-grid-layout"] = reactGridLayout;
+      onDefinition(newDefinition);
     },
-    []
+    [onDefinition]
   );
 
-
-  // if (!metapage && !error) {
-  //   return <Spinner />;
-  // }
-
-  // return <MetaframeIframe metaframe={metaframe} />;
-
-  // const layout = [
-  //   { i: "a", x: 0, y: 0, w: 1, h: 2, static: true },
-  //   { i: "b", x: 1, y: 0, w: 3, h: 2, minW: 2, maxW: 4 },
-  //   { i: "c", x: 4, y: 0, w: 1, h: 2 },
-  // ];
-
-
-  const layout = !metapage ? [] : Object.keys(metapage.getMetaframes()).map((metaframeId, i) => {
-    return {
-      i: metaframeId,
-      x: i % 2 === 0 ? 0 : 6,
-      y: Math.floor(i / 2),
-      w: 6,
-      h: 2,
+  if (error) {
+    if (ErrorWrapper) {
+      return <ErrorWrapper error={error} />;
+    } else {
+      return <div>Error: {`${error}`}</div>;
     }
-  })
-
-
-  const rowHeight = 100;
-
-  console.log('layout', layout);
+  }
 
   return (
     <ResizingGridLayout
@@ -121,53 +159,36 @@ export const MetapageGridLayout: React.FC<{
       // isDraggable={layoutEditable}
       // isResizable={layoutEditable}
       className="layout"
-      // cols={grid.cols}
-      cols={12}
-      containerPadding={[5, 5]}
+      cols={cols}
+      containerPadding={containerPadding}
       // rowHeight={grid.rowHeight}
       rowHeight={rowHeight}
-      // width={1200}
-      margin={[10, 20]}
+      margin={margin}
       onLayoutChange={onLayoutChange}
       // onResizeStop={resizeStop}
       // onDragStop={onDragStop}
       // draggableHandle=".widget-drag-handle"
     >
-
-      {
-        !metapage ? [] : Object.keys(metapage.getMetaframes()).map((metaframeId, i) =>
-          <Wrapper key={metaframeId} height={`${2*rowHeight}px`} ><MetaframeIframe key={metaframeId} metaframe={metapage.getMetaframes()[metaframeId]} /></Wrapper>
-        )
-      }
-
-{/* height={"500px"} */}
-{/* style={styleProps} */}
-      {/* {
-        !metapage ? [] : Object.keys(metapage.getMetaframes()).map((metaframeId, i) =>
-          <div key={metaframeId} ><MetaframeIframe key={metaframeId} height={`${2*rowHeight}px`} metaframe={metapage.getMetaframes()[metaframeId]} /></div>
-        )
-      } */}
+      {!metapage
+        ? []
+        : Object.keys(metapage.getMetaframes()).map((metaframeId, i) =>
+            Wrapper ? (
+              <Wrapper key={metaframeId} height={`${rowHeight}px`}>
+                <MetaframeIframe
+                  key={metaframeId}
+                  metaframe={metapage.getMetaframes()[metaframeId]}
+                />
+              </Wrapper>
+            ) : (
+              <div key={metaframeId}>
+                <MetaframeIframe
+                  key={metaframeId}
+                  height={`${rowHeight}px`}
+                  metaframe={metapage.getMetaframes()[metaframeId]}
+                />
+              </div>
+            )
+          )}
     </ResizingGridLayout>
   );
-
-  // return (
-  //   <GridLayout
-  //     className="layout"
-  //     layout={layout}
-  //     cols={12}
-  //     rowHeight={100}
-  //     width={1200}
-  //   >
-  //     {
-  //       !metapage ? [] : Object.keys(metapage.getMetaframes()).map((metaframeId, i) =>
-  //         <div key={metaframeId} style={{width:"100%", height:"100%", overflowY: "scroll" }}><MetaframeIframe key={metaframeId} metaframe={metapage.getMetaframes()[metaframeId]} /></div>
-  //       )
-  //     }
-
-  //   {/* <div key="random-data-generator" bg="white" w="100%" p={4} color="black">random-data-generator</div> */}
-  //      {/* <div key="random-data-generator"><MetaframeIframe metaframe={metapage?.getMetaframes()["random-data-generator"]} /></div> */}
-  //     {/* <div key="graph-dynamic"><MetaframeIframe metaframe={metapage?.getMetaframes()["graph-dynamic"]} /></div> */}
-
-  //   </GridLayout>
-  // );
 };
