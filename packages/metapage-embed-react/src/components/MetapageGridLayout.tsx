@@ -20,9 +20,9 @@ export const MetapageGridLayout: React.FC<{
   styleProps?: React.CSSProperties;
   stylePropsTitle?: React.CSSProperties;
   showTitle?: boolean;
-  // Wrapper: ComponentType<any>;
+  Wrapper: ComponentType<any>;
   debug?: boolean;
-}> = ({ definition, inputs, onOutputs, onDefinitionChange, debug, styleProps = {width:"100%", height:"100%", overflowY: "scroll"}, stylePropsTitle, showTitle }) => {
+}> = ({ definition, inputs, onOutputs, onDefinitionChange, debug, styleProps = {width:"100%", height:"100%", overflowY: "scroll"}, stylePropsTitle, showTitle, Wrapper }) => {
   const [metapage, setMetapage] = useState<Metapage | undefined>();
   const [error, setError] = useState<any | undefined>();
 
@@ -80,7 +80,7 @@ export const MetapageGridLayout: React.FC<{
 
   const onLayoutChange = useCallback(
     (layout: Layout[]) => {
-
+      console.log('layout', layout);
     },
     []
   );
@@ -134,19 +134,19 @@ export const MetapageGridLayout: React.FC<{
       // draggableHandle=".widget-drag-handle"
     >
 
-      {/* {
+      {
         !metapage ? [] : Object.keys(metapage.getMetaframes()).map((metaframeId, i) =>
-          <Wrapper key={metaframeId} ><MetaframeIframe key={metaframeId} metaframe={metapage.getMetaframes()[metaframeId]} /></Wrapper>
+          <Wrapper key={metaframeId} height={`${2*rowHeight}px`} ><MetaframeIframe key={metaframeId} metaframe={metapage.getMetaframes()[metaframeId]} /></Wrapper>
         )
-      } */}
+      }
 
 {/* height={"500px"} */}
 {/* style={styleProps} */}
-      {
+      {/* {
         !metapage ? [] : Object.keys(metapage.getMetaframes()).map((metaframeId, i) =>
           <div key={metaframeId} ><MetaframeIframe key={metaframeId} height={`${2*rowHeight}px`} metaframe={metapage.getMetaframes()[metaframeId]} /></div>
         )
-      }
+      } */}
     </ResizingGridLayout>
   );
 

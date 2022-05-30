@@ -8,15 +8,28 @@ export const CustomBox: React.FC = (props:any) => {
 }
 
 
+const CustomGridItemComponent = React.forwardRef((props:any, ref) => {
+
+
+    return <Box key={props.key} style={{ overflow:"hidden",...props.style}} borderWidth='1px' className={props.className} ref={ref as any} >{props.children}</Box>;
+
+
+  // <div style={{ /* styles */, ...style}} className={className} ref={ref}>
+  //     {/* Some other content */}
+  //   </div>
+})
+
+
 export const ExampleEmbedMetapage: React.FC = () => {
   const onOutputs = (outputs: any) => {
-    console.log(`Got outputs!! outputs=${JSON.stringify(outputs)}`);
+    // console.log(`Got outputs!! outputs=${JSON.stringify(outputs)}`);
   };
   return (
     <div>
       <MetapageGridLayout
         definition={exampleDefinition}
         onOutputs={onOutputs as any}
+        Wrapper={CustomGridItemComponent}
       />
     </div>
   );
