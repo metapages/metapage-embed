@@ -21,7 +21,7 @@ grey                               := "\\e[90m"
 @_help:
     just --list --unsorted --list-heading $'🔳 Commands:\n\n'
 
-dev:
+dev: _ensure_node_modules
    npm run dev
 
 # Build the client static files

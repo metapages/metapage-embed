@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { ComponentType, useEffect, useRef } from "react";
 import { MetapageIFrameRpcClient } from "@metapages/metapage";
 
 export const MetaframeIframe: React.FC<{
-  metaframe: MetapageIFrameRpcClient;
-}> = ({ metaframe }) => {
+  metaframe?: MetapageIFrameRpcClient;
+  Wrapper?: ComponentType<any>;
+  height?: string;
+}> = ({ metaframe, Wrapper, height }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -14,13 +16,9 @@ export const MetaframeIframe: React.FC<{
     if (metaframe.isDisposed()) {
       return;
     }
-    // metaframe._disposables.push(
 
+    // the iframe is delivered asynchronously
     (async () => {
-      // the iframe is delivered asynchronously
-
-      // metaframe.on("ready", () => {
-
       if (metaframe.isDisposed()) {
         return;
       }
@@ -46,7 +44,8 @@ export const MetaframeIframe: React.FC<{
         }
         // https://stackoverflow.com/questions/18765762/how-to-make-width-and-height-of-iframe-same-as-its-parent-div
         iframe.style.cssText =
-          "position:absolute;top:0px;width:100%;height:100vh;";
+          `position:absolute;top:0px;width:100%;height:${height ? height : "100vh"};`;
+          // `position:absolute;top:0px;width:100%;height:100%;`;
         ref.current.appendChild(iframe);
       }
     })();
@@ -63,5 +62,9 @@ export const MetaframeIframe: React.FC<{
     return <p>Missing metaframe</p>;
   }
 
-  return <div ref={ref} id="wrapper" style={{ position: "relative" }}></div>;
+  if (Wrapper) {
+    return <Wrapper ref={ref} key={metaframe.id} style={{ position: "relative" }} />;
+  } else {
+    return <div ref={ref} key={metaframe.id} style={{ position: "relative" }}></div>;
+  }
 };

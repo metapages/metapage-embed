@@ -11,8 +11,13 @@ export const Route: React.FC = () => {
     <div>
       <UnorderedList>
         <ListItem>
-          <Link as={RouterLink} to="/embed">
-            embed
+          <Link as={RouterLink} to="/embed-metaframe">
+            embed metaframe
+          </Link>
+        </ListItem>
+        <ListItem>
+          <Link as={RouterLink} to="/embed-metapage">
+            embed metapage
           </Link>
         </ListItem>
       </UnorderedList>
