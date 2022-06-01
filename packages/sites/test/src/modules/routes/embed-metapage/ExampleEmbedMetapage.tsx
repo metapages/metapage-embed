@@ -50,9 +50,6 @@ export const ExampleEmbedMetapage: React.FC = () => {
 
 
   const onDefinition = useCallback((def: MetapageDefinition) => {
-    console.log(`Got def=${Object.keys(def)}`);
-    console.log('exampleDefinition === def', exampleDefinition === def);
-    console.log(`Got def=${JSON.stringify(def)}`);
     setDefinition(def);
   }, [setDefinition]);
 
