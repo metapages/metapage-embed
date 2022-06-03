@@ -20,7 +20,10 @@ export const MetaframeStandaloneComponent: React.FC<{
   url: string;
   inputs?: any;
   onOutputs?: (outputs: MetaframeInputMap) => void;
-}> = ({ url, inputs, onOutputs }) => {
+  // optional, for debugging
+  onMetapageCreation?: (metapage: Metapage) => void;
+  debug?: boolean;
+}> = ({ url, inputs, onOutputs, onMetapageCreation, debug }) => {
   const [metaframe, setMetaframe] = useState<
     MetapageIFrameRpcClient | undefined
   >();
@@ -34,7 +37,7 @@ export const MetaframeStandaloneComponent: React.FC<{
     definition.metaframes.embed.url = url;
 
     const metapage = new Metapage();
-    // metapage.debug = true;
+    metapage.debug = debug!!;
     metapage.setDefinition(definition);
 
     setMetapage(metapage);
@@ -46,10 +49,15 @@ export const MetaframeStandaloneComponent: React.FC<{
       metaframe.onOutputs(onOutputs);
     }
 
+    // for debugging
+    if (onMetapageCreation) {
+      onMetapageCreation(metapage);
+    }
+
     return () => {
       metapage.dispose();
     };
-  }, [url, setMetaframe, onOutputs]);
+  }, [url, setMetaframe, onOutputs, onMetapageCreation, debug]);
 
   // listeners
   useEffect(() => {
@@ -59,20 +67,6 @@ export const MetaframeStandaloneComponent: React.FC<{
       });
     }
   }, [metapage, inputs]);
-
-  // listeners
-  useEffect(() => {
-    if (!metapage || metapage.isDisposed() || !onOutputs) {
-      return;
-    }
-    const disposer = metapage.addListenerReturnDisposer(
-      MetapageEvents.Outputs,
-      onOutputs
-    );
-    return () => {
-      disposer();
-    };
-  }, [metapage, onOutputs]);
 
   if (!metaframe) {
     return <p>...</p>;
