@@ -1,4 +1,10 @@
-import React, { ComponentType, useCallback, useEffect, useState } from "react";
+import React, {
+  ComponentType,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   Metapage,
   MetapageDefinition,
@@ -7,9 +13,10 @@ import {
   MetapageInstanceInputs,
 } from "@metapages/metapage";
 import GridLayout, { Layout, WidthProvider } from "react-grid-layout";
+import hash from "object-hash";
+import { MetaframeIframe } from "./MetaframeIframe";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { MetaframeIframe } from "./MetaframeIframe";
 
 const ResizingGridLayout = WidthProvider(GridLayout);
 
@@ -30,17 +37,51 @@ export const MetapageGridLayout: React.FC<{
   Wrapper,
   ErrorWrapper,
 }) => {
+  const definitionRef = useRef<{
+    definition: MetapageDefinition;
+    hash?: string;
+  }>();
+  const [definitionInternal, setDefinitionInternal] = useState<
+    MetapageDefinition | undefined
+  >();
   const [metapage, setMetapage] = useState<Metapage | undefined>();
   const [error, setError] = useState<any | undefined>();
+
+  // Make sure incoming definitions are not duplicates of the current definition
+  useEffect(() => {
+    if (!definition) {
+      definitionRef.current = undefined;
+      setDefinitionInternal(undefined);
+    } else {
+      if (!definitionRef.current) {
+        definitionRef.current = { definition };
+        setDefinitionInternal(definition);
+      } else {
+        // lazily compute hashes only once
+        if (!definitionRef.current.hash) {
+          definitionRef.current.hash = hash(definitionRef.current.definition);
+        }
+        const hashDefinition = hash(definition);
+        if (hashDefinition !== definitionRef.current.hash) {
+          definitionRef.current = { definition, hash: hashDefinition };
+          setDefinitionInternal(definition);
+        }
+      }
+    }
+  }, [definition, setDefinitionInternal, definitionRef]);
 
   // create the metapage and bind
   useEffect(() => {
     setError(undefined);
+    if (!definitionInternal) {
+      return;
+    }
+
     // now actually create the metapage
     const metapage = new Metapage();
     metapage.debug = debug!!;
     try {
-      metapage.setDefinition(definition);
+      metapage.setDefinition(definitionInternal);
     } catch (err) {
       console.error(err);
       setMetapage(undefined);
@@ -77,7 +118,7 @@ export const MetapageGridLayout: React.FC<{
       }
       metapage.dispose();
     };
-  }, [definition, setMetapage, onOutputs, debug, onDefinition]);
+  }, [definitionInternal, setMetapage, onOutputs, debug, onDefinition]);
 
   // listeners
   useEffect(() => {
@@ -99,32 +140,32 @@ export const MetapageGridLayout: React.FC<{
       });
   const rowHeight =
     (metapage &&
-      definition?.meta?.layouts?.["react-grid-layout"]?.props?.rowHeight) ||
+      definitionInternal?.meta?.layouts?.["react-grid-layout"]?.props
+        ?.rowHeight) ||
     100;
   const containerPadding = (metapage &&
-    definition?.meta?.layouts?.["react-grid-layout"]?.props
+    definitionInternal?.meta?.layouts?.["react-grid-layout"]?.props
       ?.containerPadding) || [5, 5];
   const cols =
     (metapage &&
-      definition?.meta?.layouts?.["react-grid-layout"]?.props?.cols) ||
+      definitionInternal?.meta?.layouts?.["react-grid-layout"]?.props?.cols) ||
     12;
   const margin = (metapage &&
-    definition?.meta?.layouts?.["react-grid-layout"]?.props?.margin) || [
-    10, 20,
-  ];
+    definitionInternal?.meta?.layouts?.["react-grid-layout"]?.props
+      ?.margin) || [10, 20];
   let layout =
-    metapage && definition?.meta?.layouts?.["react-grid-layout"]?.layout
-      ? [...definition?.meta?.layouts?.["react-grid-layout"]?.layout]
+    metapage && definitionInternal?.meta?.layouts?.["react-grid-layout"]?.layout
+      ? [...definitionInternal?.meta?.layouts?.["react-grid-layout"]?.layout]
       : defaultLayout;
   const onLayoutChange = useCallback(
     (layout: Layout[]) => {
-      if (!onDefinition) {
+      if (!onDefinition || !definitionInternal) {
         return;
       }
 
       // The passed in definition could be immutable, so we need to clone it
       const newDefinition: MetapageDefinition = JSON.parse(
-        JSON.stringify(definition)
+        JSON.stringify(definitionInternal)
       );
       newDefinition.meta = newDefinition.meta || {};
       newDefinition.meta.layouts = newDefinition.meta.layouts || {};
@@ -142,7 +183,7 @@ export const MetapageGridLayout: React.FC<{
       newDefinition.meta.layouts["react-grid-layout"] = reactGridLayout;
       onDefinition(newDefinition);
     },
-    [onDefinition]
+    [onDefinition, definitionInternal]
   );
 
   if (error) {
