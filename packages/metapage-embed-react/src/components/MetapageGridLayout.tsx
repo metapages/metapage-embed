@@ -55,7 +55,10 @@ export const MetapageGridLayout: React.FC<{
     } else {
       if (!definitionRef.current) {
         definitionRef.current = { definition };
-        setDefinitionInternal(definition);
+        // churn because the incoming might be immutable, but the metapage
+        // modifies the internal definition and re-emits it
+        // That might be bad but it's how its done right now
+        setDefinitionInternal(JSON.parse(JSON.stringify(definition)));
       } else {
         // lazily compute hashes only once
         if (!definitionRef.current.hash) {
@@ -64,7 +67,8 @@ export const MetapageGridLayout: React.FC<{
         const hashDefinition = hash(definition);
         if (hashDefinition !== definitionRef.current.hash) {
           definitionRef.current = { definition, hash: hashDefinition };
-          setDefinitionInternal(definition);
+          // See comment above about churn
+          setDefinitionInternal(JSON.parse(JSON.stringify(definition)));
         }
       }
     }
