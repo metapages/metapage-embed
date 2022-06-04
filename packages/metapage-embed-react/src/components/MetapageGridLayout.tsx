@@ -104,7 +104,15 @@ export const MetapageGridLayout: React.FC<{
       disposers.push(
         metapage.addListenerReturnDisposer(
           MetapageEvents.Definition,
-          (e: MetapageEventDefinition) => onDefinition(e.definition)
+          (e: MetapageEventDefinition) => {
+            // Update the local definitionRef that is authoritative on what
+            // is actually running, so incoming updates don't unnecessarily
+            // clobber (and cause ugly re-renders)
+            // This update comes from internal metaframe URL updates, so there's
+            // no need to trigger a re-render
+            definitionRef.current = { definition: e.definition };
+            onDefinition(e.definition);
+          }
         )
       );
     }
@@ -118,7 +126,14 @@ export const MetapageGridLayout: React.FC<{
       }
       metapage.dispose();
     };
-  }, [definitionInternal, setMetapage, onOutputs, debug, onDefinition]);
+  }, [
+    definitionInternal,
+    setMetapage,
+    onOutputs,
+    debug,
+    onDefinition,
+    definitionRef,
+  ]);
 
   // listeners
   useEffect(() => {
