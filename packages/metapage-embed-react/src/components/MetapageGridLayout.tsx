@@ -6,10 +6,7 @@ import {
   MetapageEvents,
   MetapageInstanceInputs,
 } from "@metapages/metapage";
-import GridLayout, {
-  Layout,
-  WidthProvider,
-} from "react-grid-layout";
+import GridLayout, { Layout, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { MetaframeIframe } from "./MetaframeIframe";
@@ -66,7 +63,7 @@ export const MetapageGridLayout: React.FC<{
       disposers.push(
         metapage.addListenerReturnDisposer(
           MetapageEvents.Definition,
-          (e :MetapageEventDefinition) => onDefinition(e.definition)
+          (e: MetapageEventDefinition) => onDefinition(e.definition)
         )
       );
     }
@@ -125,7 +122,10 @@ export const MetapageGridLayout: React.FC<{
         return;
       }
 
-      const newDefinition = { ...definition };
+      // The passed in definition could be immutable, so we need to clone it
+      const newDefinition: MetapageDefinition = JSON.parse(
+        JSON.stringify(definition)
+      );
       newDefinition.meta = newDefinition.meta || {};
       newDefinition.meta.layouts = newDefinition.meta.layouts || {};
 
