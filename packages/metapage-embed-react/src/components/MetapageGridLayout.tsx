@@ -87,7 +87,6 @@ export const MetapageGridLayout: React.FC<{
     try {
       metapage.setDefinition(definitionInternal);
     } catch (err) {
-      console.error(err);
       setMetapage(undefined);
       setError(err);
       return;
