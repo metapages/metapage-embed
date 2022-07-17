@@ -34,28 +34,29 @@ _help:
     #!/usr/bin/env bash
     # exit when any command fails
     set -euo pipefail
-    if [ -f /.dockerenv ]; then
+    # if [ -f /.dockerenv ]; then
         echo -e ""
         just --list --unsorted --list-heading $'🌱 Commands:\n\n'
         echo -e ""
         echo -e "    Github  URL 🔗 {{green}}$(cat package.json | jq -r '.repository.url'){{normal}}"
         echo -e "    Publish URL 🔗 {{green}}https://$(cat package.json | jq -r '.name' | sd '/.*' '' | sd '@' '').github.io/{{PACKAGE_NAME_SHORT}}/{{normal}}"
         echo -e ""
-    else
-        just _docker;
-    fi
+    # else
+    #     just _docker;
+    # fi
 
 # Run the dev server. Opens the web app in browser.
 dev:
     #!/usr/bin/env bash
     set -euo pipefail
-    if [ -f /.dockerenv ]; then
-        just _dev;
-    else
+    # if [ -f /.dockerenv ]; then
+    #     just _dev;
+    # else
         just _mkcert;
         open https://${APP_FQDN}:${APP_PORT};
-        just _docker just _dev;
-    fi
+        # just _docker just _dev;
+        just _dev;
+    # fi
 
 _dev: _mkcert _ensure_npm_modules (_tsc "--build")
     #!/usr/bin/env bash

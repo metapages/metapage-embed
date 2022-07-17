@@ -1,14 +1,13 @@
-import { defineConfig } from 'vite'
+import { defineConfig } from 'vite';
 import * as path from "path";
-import react from '@vitejs/plugin-react'
+import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
-
 // https://vitejs.dev/config/
 export default defineConfig({
     plugins: [
         react(),
         dts({
-            insertTypesEntry: true,
+            insertTypesEntry: true
         }),
     ],
     build: {
@@ -16,7 +15,7 @@ export default defineConfig({
             entry: path.resolve(__dirname, 'src/lib/index.ts'),
             name: path.basename(__dirname).replace(/-/g, '_'),
             formats: ['es', 'umd'],
-            fileName: (format) => `${path.basename(__dirname)}.${format}.js`,
+            fileName: function (format) { return "".concat(path.basename(__dirname), ".").concat(format, ".js"); }
         },
         rollupOptions: {
             // external: ['react', 'react-dom', 'styled-components'],
@@ -24,10 +23,9 @@ export default defineConfig({
             output: {
                 globals: {
                     react: 'React',
-                    'react-dom': 'ReactDOM',
-                    // 'styled-components': 'styled',
-                },
-            },
-        },
-    },
+                    'react-dom': 'ReactDOM'
+                }
+            }
+        }
+    }
 });
