@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import {
   Metapage,
-  MetapageDefinition,
+  MetapageDefinitionV3,
   MetapageEventDefinition,
   MetapageEvents,
   MetapageInstanceInputs,
@@ -21,11 +21,11 @@ import "react-resizable/css/styles.css";
 const ResizingGridLayout = WidthProvider(GridLayout);
 
 export const MetapageGridLayout: React.FC<{
-  definition?: MetapageDefinition;
+  definition?: MetapageDefinitionV3;
   metapage?: Metapage;
   inputs?: MetapageInstanceInputs;
   onOutputs?: (outputs: MetapageInstanceInputs) => void;
-  onDefinition?: (e: MetapageDefinition) => void;
+  onDefinition?: (e: MetapageDefinitionV3) => void;
   Wrapper?: ComponentType<any>;
   ErrorWrapper?: ComponentType<any>;
   debug?: boolean;
@@ -40,11 +40,11 @@ export const MetapageGridLayout: React.FC<{
   ErrorWrapper,
 }) => {
   const definitionRef = useRef<{
-    definition: MetapageDefinition;
+    definition: MetapageDefinitionV3;
     hash?: string;
   }>();
   const [definitionInternal, setDefinitionInternal] = useState<
-    MetapageDefinition | undefined
+  MetapageDefinitionV3 | undefined
   >();
   const [metapageInternal, setMetapageInternal] = useState<
     Metapage | undefined
@@ -207,7 +207,7 @@ export const MetapageGridLayout: React.FC<{
       }
 
       // The passed in definition could be immutable, so we need to clone it
-      const newDefinition: MetapageDefinition = JSON.parse(
+      const newDefinition: MetapageDefinitionV3 = JSON.parse(
         JSON.stringify(definitionInternal)
       );
       newDefinition.meta = newDefinition.meta || {};
