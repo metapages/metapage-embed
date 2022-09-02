@@ -5,7 +5,8 @@ export const MetaframeIframe: React.FC<{
   metaframe?: MetapageIFrameRpcClient;
   Wrapper?: ComponentType<any>;
   height?: string;
-}> = ({ metaframe, Wrapper, height }) => {
+  style?: React.CSSProperties;
+}> = ({ metaframe, Wrapper, height, style }) => {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -68,7 +69,7 @@ export const MetaframeIframe: React.FC<{
     );
   } else {
     return (
-      <div ref={ref} key={metaframe.id} style={{ position: "relative" }}></div>
+      <div ref={ref} key={metaframe.id} style={{ position: "relative", ...style }}></div>
     );
   }
 };

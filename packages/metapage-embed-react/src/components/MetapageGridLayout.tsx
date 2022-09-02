@@ -241,8 +241,8 @@ export const MetapageGridLayout: React.FC<{
     <ResizingGridLayout
       layout={layout}
       // isBounded={grid.bounded}
-      // isDraggable={layoutEditable}
-      // isResizable={layoutEditable}
+      isDraggable={true}
+      isResizable={true}
       className="layout"
       cols={cols}
       containerPadding={containerPadding}

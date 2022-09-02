@@ -23,7 +23,9 @@ export const MetaframeStandaloneComponent: React.FC<{
   // optional, for debugging
   onMetapageCreation?: (metapage: Metapage) => void;
   debug?: boolean;
-}> = ({ url, inputs, onOutputs, onMetapageCreation, debug }) => {
+  style?: React.CSSProperties;
+  height?: string;
+}> = ({ url, inputs, onOutputs, onMetapageCreation, debug, height, style }) => {
   const [metaframe, setMetaframe] = useState<
     MetapageIFrameRpcClient | undefined
   >();
@@ -72,5 +74,5 @@ export const MetaframeStandaloneComponent: React.FC<{
     return <p>...</p>;
   }
 
-  return <MetaframeIframe metaframe={metaframe} />;
+  return <MetaframeIframe metaframe={metaframe} style={style} height={height}/>;
 };
