@@ -113,7 +113,7 @@ const exampleDefinition: MetapageDefinition = {
       ],
     },
     editor: {
-      url: "https://metapages.github.io/metaframe-editor/",
+      url: "https://editor.mtfm.io/",
       inputs: [
         {
           metaframe: "random-data-generator",
@@ -125,6 +125,6 @@ const exampleDefinition: MetapageDefinition = {
   },
   plugins: [
     "https://metapages.org/metaframes/mermaid.js/?TITLE=0",
-    "https://metapages.github.io/metaframe-editor/",
+    "https://editor.mtfm.io/",
   ],
 };
