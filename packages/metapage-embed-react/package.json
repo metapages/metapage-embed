@@ -35,7 +35,7 @@
     "vite-plugin-dts": "^1.2.0"
   },
   "peerDependencies": {
-    "@metapages/metapage": "^0.12.3",
+    "@metapages/metapage": "^0.13.0",
     "react": "^16.8.0 || 18.x",
     "react-dom": "^16.8.0 || 18.x"
   }
