@@ -1,5 +1,10 @@
-import React, { ComponentType, useEffect, useRef } from "react";
-import { MetapageIFrameRpcClient } from "@metapages/metapage";
+import React, {
+  ComponentType,
+  useEffect,
+  useRef,
+} from 'react';
+
+import { MetapageIFrameRpcClient } from '@metapages/metapage';
 
 export const MetaframeIframe: React.FC<{
   metaframe?: MetapageIFrameRpcClient;
@@ -69,7 +74,15 @@ export const MetaframeIframe: React.FC<{
     );
   } else {
     return (
-      <div ref={ref} key={metaframe.id} style={{ position: "relative", ...style }}></div>
+      <div
+        ref={ref}
+        key={metaframe.id}
+        style={{
+          position: "relative",
+          ...style,
+          ...(height ? { height } : {}),
+        }}
+      ></div>
     );
   }
 };

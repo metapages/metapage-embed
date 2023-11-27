@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
 import {
   MetaframeInputMap,
   Metapage,
-  MetapageEvents,
   MetapageIFrameRpcClient,
-} from "@metapages/metapage";
-import { MetaframeIframe } from "./MetaframeIframe";
+} from '@metapages/metapage';
+
+import { MetaframeIframe } from './MetaframeIframe';
 
 const MetaPageTemplate = {
   version: "0.3",
@@ -18,7 +22,7 @@ const MetaPageTemplate = {
 
 export const MetaframeStandaloneComponent: React.FC<{
   url: string;
-  inputs?: any;
+  inputs?: MetaframeInputMap;
   onOutputs?: (outputs: MetaframeInputMap) => void;
   // optional, for debugging
   onMetapageCreation?: (metapage: Metapage) => void;

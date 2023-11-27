@@ -1,7 +1,7 @@
 {
   "name": "@metapages/metapage-embed-react",
   "private": false,
-  "version": "0.0.20",
+  "version": "0.0.27",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

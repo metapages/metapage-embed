@@ -142,6 +142,8 @@ _npm_version npmversionargs="patch":
     git add package.json package-lock.json ../../package-lock.json
     git commit -m "bump version to $(cat package.json | jq -r '.version')"
 
+_npm +args="": _ensure_npm_modules
+    npm {{args}}
 
 # If the npm version does not exist, publish the module
 _npm_publish: _require_NPM_TOKEN _npm_build
@@ -175,9 +177,9 @@ _npm_publish: _require_NPM_TOKEN _npm_build
     fi
 
     echo -e "  👉 PUBLISHING npm version $VERSION"
-    if [ ! -f .npmrc ]; then
-        echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
-    fi
+    # if [ ! -f ../../.npmrc ]; then
+        echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ../../.npmrc
+    # fi
     npm publish --access public .
 
 # build production brower assets
